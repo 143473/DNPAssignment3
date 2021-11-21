@@ -1,0 +1,47 @@
+@page "/AddUser"
+@using BlazorClient.Authentication
+@using BlazorClient.Data
+@using BlazorClient.Models
+@using Microsoft.AspNetCore.Components
+@inject IUserService UserService
+@inject NavigationManager NavigationManager
+@inject  AuthenticationStateProvider AuthenticationStateProvider
+
+
+<h3>AddUser</h3>
+<EditForm Model="@newUser" OnValidSubmit="@AddNewUser" Context="b">
+                 <DataAnnotationsValidator/>
+                 <ValidationSummary/>
+                 <table class="tableAdd">
+                     <tr><td><label>User name:</label></td> <td> <input type="text" placeholder="user name" @bind-value="newUser.UserName"/></td> </tr>
+                     <tr><td><label>Password</label></td> <td> <input type="password" placeholder="password" @bind-value="newUser.Password"/></td> </tr>
+                     <tr>
+                         <td>
+                             <button class="btn btn-outline-dark" type="submit"> Create</button>
+                         </td></tr>
+                 </table>
+             </EditForm>
+
+@code {
+        private User newUser = new();
+
+        private async Task AddNewUser()
+        {
+            await UserService.AddUserAsync(newUser);
+            await PerformLogin();
+        }
+        public async Task PerformLogin()
+        {
+            var errorMessage = "";
+            try
+            {
+                await ((CustomAuthenticationStateProvider) AuthenticationStateProvider).ValidateLoginAsync(newUser.UserName, newUser.Password);
+                Console.WriteLine(newUser.UserName + newUser.Password);
+                NavigationManager.NavigateTo("/");
+            }
+            catch (Exception e)
+            {
+                errorMessage = e.Message;
+            }
+        }
+    }

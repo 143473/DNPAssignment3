@@ -1,0 +1,70 @@
+@page "/Login"
+
+@namespace LoginComponent
+@using BlazorClient.Authentication
+
+@inject  AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+
+<AuthorizeView>
+    <NotAuthorized >
+        <h1>Welcome, visitor!</h1>
+        <h3>You have to login in order to use this application!</h3><br/>
+        <table class="tableAdd">
+        <div style="color:red">@errorMessage</div>
+        <tr><td><label>User name:</label></td> <td> <input type="text" placeholder="user name" @bind-value="username"/></td> </tr>
+        <tr><td><label>Password</label></td> <td> <input type="password" placeholder="password" @bind-value="password"/></td> </tr>
+        <tr><td> <button class="btn btn-outline-dark" @onclick="PerformLogin">Login</button></td> <td> <button class="btn btn-outline-dark" @onclick="CreateUser">Create Account</button></td> </tr>
+        </table>
+        
+    </NotAuthorized>
+    <Authorized>
+        <h1>Welcome @context.User.Identity.Name!</h1>
+        <button @onclick="PerformLogout"> Log out </button>
+    </Authorized>
+</AuthorizeView>
+
+<tr><td></td> <td></td> </tr>
+
+@code {
+    public string username;
+    private string password;
+    private string errorMessage;
+
+    public async Task PerformLogin()
+    {
+        errorMessage = "";
+        try
+        {
+            await ((CustomAuthenticationStateProvider) AuthenticationStateProvider).ValidateLoginAsync(username, password);
+            username = "";
+            password = "";
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+            errorMessage = e.Message;
+        }
+    }
+
+    public async Task PerformLogout()
+    {
+        errorMessage = "";
+        username = "";
+        password = "";
+        try
+        {
+            await ((CustomAuthenticationStateProvider) AuthenticationStateProvider).Logout();
+            NavigationManager.NavigateTo("/");
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    public void CreateUser()
+    {
+        NavigationManager.NavigateTo("/AddUser");
+    }
+
+}

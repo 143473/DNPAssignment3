@@ -1,0 +1,98 @@
+@page "/AddAdult"
+
+
+@using Microsoft.AspNetCore.Components
+@using BlazorClient.Models
+@using BlazorClient.Data
+@inject NavigationManager NavigationManager
+@inject IAdultData AdultData
+
+<h3>Add Adult Here</h3>
+
+<EditForm Model="@adult" OnValidSubmit="@AddAdultAsync">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    <div style="color:red">@errorMessage</div>
+    <div class="form-group">
+        First name:
+        <InputText type="text" @bind-Value="adult.FirstName"/>
+    </div>
+    <div class="form-group">
+        Last name:
+        <InputText type="text" @bind-Value="adult.LastName"/>
+    </div>
+    <div class="form-group">
+        <p>
+            Sex:
+            <select class="form-control selectpicker" style="width: 75px" @bind="adult.Sex">
+                <option>M</option>
+                <option>F</option>
+            </select>
+        </p>
+    </div>
+    <div class="form-group">
+        Age:
+        <InputNumber @bind-Value="adult.Age"/>
+    </div>
+    <div class="form-group">
+        Job Title:
+        <InputText type="text" @bind-Value="jobTitle"/>
+    </div>
+    <div class="form-group">
+        Salary:
+        <InputNumber @bind-Value="salary"/>
+    </div>
+    <div class="form-group">
+        Height:
+        <InputNumber @bind-Value="adult.Height"/>
+    </div>
+    <div class="form-group">
+        Weight:
+        <InputNumber @bind-Value="adult.Weight"/>
+    </div>
+    <div class="form-group">
+        Hair Color:
+        <InputText type="text" @bind-Value="adult.HairColor"/>
+    </div>
+    <div class="form-group">
+        <p>
+            Eye Color:
+            <select class="form-control selectpicker" style="width: 150px" @bind="adult.EyeColor">
+                <option>Brown</option>
+                <option>Blue</option>
+                <option>Amber</option>
+                <option>Gray</option>
+                <option>Green</option>
+                <option>Other</option>
+            </select>
+        </p>
+    </div>
+    <p class="actions">
+        <button class="btn btn-outline-dark" type="submit">Create</button>
+    </p>
+</EditForm>
+
+@code
+{
+    private readonly Adult adult = new();
+    private string jobTitle;
+    private int salary;
+    private readonly string errorMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        adult.Sex = "M";
+        adult.EyeColor = "Brown";
+    }
+
+    private async Task AddAdultAsync()
+    {
+        adult.JobTitle = new Job
+        {
+            JobTitle = jobTitle,
+            Salary = salary
+        };
+        await AdultData.AddAdultAsync(adult);
+        NavigationManager.NavigateTo("/AdultsList");
+    }
+}

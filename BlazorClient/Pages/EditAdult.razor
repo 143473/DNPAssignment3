@@ -1,0 +1,64 @@
+
+@using BlazorClient.Data
+@using BlazorClient.Models
+
+@using Microsoft.AspNetCore.Components
+@inject IAdultData AdultData
+@inject NavigationManager NavMgr
+
+@page "/Edit/{Id:int}"
+<h3>Edit Adult: </h3>
+
+@if (adultToEdit == null)
+{
+    <em>Adult not found!</em>
+}
+else
+{
+    <EditForm Model="@adultToEdit" OnValidSubmit="@Save">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+    <table class="tableAdd">
+        <tr><td>First Name:</td> <td><InputText @bind-Value="adultToEdit.FirstName"/></td> </tr>
+        <tr><td> Last Name:</td> <td><InputText @bind-Value="adultToEdit.LastName"/></td> </tr>
+        <tr><td> Hair Color:</td> <td> <InputText @bind-Value="adultToEdit.HairColor"/></td></tr>
+        <tr><td>Eye Color:</td> <td><InputText @bind-Value="adultToEdit.EyeColor"/></td></tr>
+        <tr><td> Age:</td>  <td> <InputNumber @bind-Value="adultToEdit.Age"/></td></tr>
+        <tr><td>Sex:</td>  <td><InputSelect @bind-Value="adultToEdit.Sex">
+            <option value="">Select sex</option>
+            <option value="F">Female</option>
+            <option value="M">Male</option>
+        </InputSelect></td></tr>
+        <tr><td>  Weight:</td><td> <InputNumber rows="1" @bind-Value="adultToEdit.Weight"/></td></tr>
+        <tr><td>Height:</td><td><InputNumber rows="1" @bind-Value="adultToEdit.Height"/></td></tr>
+        <tr><td>    Job:</td><td><InputText @bind-Value="adultToEdit.JobTitle.JobTitle"/></td></tr>
+        <tr><td>Salary:</td><td><InputNumber rows="1" @bind-Value="adultToEdit.JobTitle.Salary"/></td></tr>
+        <tr><td><button class="btn btn-outline-dark" type="submit">Save</button></td><td> <button class="btn btn-outline-dark" type="button" @onclick="@Back">Go back</button></td></tr>
+    </table>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private Adult adultToEdit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        adultToEdit = await AdultData.GetAdultAsync(Id);
+    }
+
+    private async Task Save()
+    {
+        await AdultData.UpdateAdultAsync(adultToEdit);
+        NavMgr.NavigateTo("/AdultsList");
+    }
+
+    private void Back()
+    {
+        NavMgr.NavigateTo("/AdultsList");
+    }
+
+}

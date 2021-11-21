@@ -1,0 +1,274 @@
+@page "/AdultsList"
+
+@using Microsoft.AspNetCore.Components
+@using System.Collections
+@using BlazorClient.Data
+@using BlazorClient.Models
+@inject IAdultData AdultData
+@inject NavigationManager NavMgr
+@inject AuthenticationStateProvider Auth
+
+
+<h1>Adults list</h1>
+<p>
+    Search Adult by name: <input type="text" @oninput="@(arg => SearchByName(arg))" style="width: 250px"/>
+</p>
+
+<EditForm Model="filter">
+
+    <div >
+        Filter by:
+        <InputSelect @oninput="@(arg => Filter(arg))" @bind-Value="filter">
+            <option value="">Choose Category</option>
+            @foreach (var item in filterList)
+            {
+                <option value=@item>@item</option>
+            }
+        </InputSelect>
+        @if (filterList.Exists(t => filter.Equals(t)))
+        {
+            <InputSelect @oninput="@(arg => Filter2(arg))" @bind-Value="filter2">
+
+                @if (filterList2 != null)
+                {
+                    <option value="">No Filter Selected</option>
+                    foreach (var item in filterList2)
+                    {
+                        <option value=@item>@item</option>
+                    }
+                }
+                else
+                {
+                    <option value="">No Filter Selected</option>
+                }
+            </InputSelect>
+        }
+    </div>
+</EditForm>
+
+
+@if (adultsToShow == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else if (!adultsToShow.Any())
+{
+    <p>
+        <em>No Adults exist. Please add some.</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Adult ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Hair Color</th>
+            <th>Eye Color</th>
+            <th>Sex</th>
+            <th>Age</th>
+            <th>Weight</th>
+            <th>Height</th>
+            <th>Job Title</th>
+            <th>Salary</th>
+            <AuthorizeView Policy="moderator">
+                <th>Remove</th>
+                <th>Edit</th>
+            </AuthorizeView>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in adultsToShow)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.FirstName</td>
+                <td>@item.LastName</td>
+                <td>@item.HairColor</td>
+                <td>@item.EyeColor</td>
+                <td>@item.Sex</td>
+                <td>@item.Age</td>
+                <td>@item.Weight</td>
+                <td>@item.Height</td>
+                <td>@item.JobTitle.JobTitle</td>
+                <td>@item.JobTitle.Salary</td>
+                
+                <AuthorizeView Policy="moderator">
+                    <td>
+                        <button @onclick="@(() => RemoveAdult(item.Id))">
+                            <i class="oi oi-trash" style="color:red"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <button @onclick="@(() => Edit(item.Id))">
+                            <i class="oi oi-pencil" style="color:#1b6ec2"></i>
+                        </button>
+                    </td>
+                </AuthorizeView>
+
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IList<Adult> adultsToShow;
+    private IList<Adult> allAdults;
+
+    private string searchByName = "";
+    private string filter = "";
+    private string filter2 = "";
+    private string orderBy = "";
+
+    private List<string> filterList = new() {"HairColor", "EyeColor", "Sex", "JobTitle"};
+    private List<string> filterList2;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allAdults = await AdultData.GetAdultsAsync();
+        await ExecuteFilter();
+    }
+
+    private async Task RemoveAdult(int adultId)
+    {
+        Adult adultToRemove = allAdults.First(t => t.Id == adultId);
+        await AdultData.RemoveAdultAsync(adultId);
+        allAdults.Remove(adultToRemove);
+        adultsToShow.Remove(adultToRemove);
+    }
+
+    private async Task SearchByName(ChangeEventArgs changeEventArgs)
+    {
+        searchByName = null;
+        try
+        {
+            searchByName = changeEventArgs.Value.ToString();
+        }
+        catch (Exception)
+        {
+        }
+        await ExecuteFilter();
+    }
+
+    private async Task Filter(ChangeEventArgs changeEventArgs)
+    {
+        filter = null;
+        filterList2 = null;
+        try
+        {
+            filter = changeEventArgs.Value.ToString();
+            switch (filter)
+            {
+                case "HairColor":
+                    filterList2 = allAdults.Select(x => x.HairColor).Distinct().ToList();
+                    break;
+                case "EyeColor":
+                    filterList2 = allAdults.Select(x => x.EyeColor).Distinct().ToList();
+                    break;
+                case "Sex":
+                    filterList2 = allAdults.Select(x => x.Sex).Distinct().ToList();
+                    break;
+                case "JobTitle":
+                    filterList2 = allAdults.Select(x => x.JobTitle.JobTitle).Distinct().ToList();
+                    break;
+            }
+        }
+        catch (Exception)
+        {
+        }
+        filter2 = "";
+        await ExecuteFilter();
+    }
+
+    private async Task Filter2(ChangeEventArgs changeEventArgs)
+    {
+        filter2 = null;
+        try
+        {
+            filter2 = changeEventArgs.Value.ToString();
+        }
+        catch (Exception)
+        {
+        }
+        await ExecuteFilter();
+    }
+
+    private async Task ExecuteFilter()
+    {
+        adultsToShow = allAdults.Where(t =>
+            (!searchByName.Equals("") && (t.FirstName.Contains(searchByName, StringComparison.OrdinalIgnoreCase) ||
+                                          t.LastName.Contains(searchByName, StringComparison.OrdinalIgnoreCase)) ||
+             searchByName.Equals("")) &&
+            (!filter2.Equals("") &&
+             (t.Sex.Equals(filter2) || (t.EyeColor.Equals(filter2) && filter.Equals("EyeColor")) ||
+              (t.HairColor.Equals(filter2) && filter.Equals("HairColor")) || t.JobTitle.JobTitle.Equals(filter2)) ||
+             filter2.Equals("")
+                )
+            ).ToList();
+    }
+
+    /*private void OrderBy()
+    {
+        switch (orderBy)
+        {
+            case "Id": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.Id).ToList();
+                break;
+            case "FirstName": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.FirstName).ToList();
+                break;
+            case "LastName": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.LastName).ToList();
+                break;
+            case "HairColor": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.HairColor).ToList();
+                break;
+            case "EyeColor": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.EyeColor).ToList();
+                break;
+            case "Height": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.Height).ToList();
+                break;
+            case "Age": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.Age).ToList();
+                break;
+            case "Weight": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.Weight).ToList();
+                break;
+            case "Sex": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.Sex).ToList();
+                break;
+            case "JobTitle": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.JobTitle.JobTitle).ToList();
+                break;
+            case "Salary": 
+                ExecuteFilter();
+                adultsToShow.OrderBy(t => t.JobTitle.Salary).ToList();
+                break;
+
+        }
+
+        
+    }*/
+
+    private void Edit(int id)
+    {
+        NavMgr.NavigateTo($"Edit/{id}");
+    }
+
+}

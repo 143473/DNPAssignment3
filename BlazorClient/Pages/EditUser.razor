@@ -1,0 +1,78 @@
+@page "/EditUser/{Id:int}"
+@using Microsoft.AspNetCore.Components
+@using BlazorClient.Data
+@using BlazorClient.Models
+@inject NavigationManager NavMgr
+@inject IUserService UserService
+@attribute [Authorize(Policy = "admin")]
+<h3>EditUser</h3>
+
+@if (userToEdit == null)
+{
+    <em>User not found!</em>
+}
+else
+{
+    <EditForm Model="@userToEdit" OnValidSubmit="@Save">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <table class="tableAdd">
+            <tr>
+                <td>UserName:</td>
+                <td>
+                    <InputText @bind-Value="userToEdit.UserName"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td>
+                    <InputText @bind-Value="userToEdit.Password"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>
+                    <InputSelect @bind-Value="userToEdit.Role">
+                        <option value="user">user</option>
+                        <option value="moderator">moderator</option>
+                    </InputSelect>
+                </td>
+            </tr>
+            <tr>
+                <td>Security Level</td>
+                <td>
+                    <InputSelect @bind-Value="userToEdit.SecurityLevel">
+                        <option value="1">Level 1</option>
+                        <option value="2">Level 2</option>
+                    </InputSelect>
+                </td>
+            </tr>
+            <tr><td><button class="btn btn-outline-dark" type="submit">Save</button></td><td> <button class="btn btn-outline-dark" type="button" @onclick="@Back">Go back</button></td></tr>
+        </table>
+    </EditForm>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private User userToEdit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        userToEdit = await UserService.GetUserAsync(Id);
+    }
+
+    private async Task Save()
+    {
+        await UserService.UpdateUserAsync(userToEdit);
+        NavMgr.NavigateTo("/UsersList");
+    }
+
+    private void Back()
+    {
+        NavMgr.NavigateTo("/UsersList");
+    }
+
+}
