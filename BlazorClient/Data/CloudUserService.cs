@@ -27,10 +27,6 @@ namespace BlazorClient.Data
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
-            foreach (var u in result)
-            {
-                Console.WriteLine(u.UserName);
-            }
             return result;
         }
 

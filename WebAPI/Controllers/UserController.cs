@@ -27,10 +27,6 @@ namespace WebAPI.Controllers
             try
             {
                 IList<User> users = await userService.GetUsersAsync();
-                foreach (var u in users)
-                {
-                    Console.WriteLine(u.UserName);
-                }
                 return Ok(users);
    
             }
@@ -121,7 +117,7 @@ namespace WebAPI.Controllers
             }
             catch (Exception e)
             {
-                return BadRequest("crap");
+                return BadRequest();
             }
         }
         
