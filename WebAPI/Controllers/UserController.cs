@@ -59,7 +59,7 @@ namespace WebAPI.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
-        public async Task<ActionResult> RemoveUserAsync([FromQuery] int? id)
+        public async Task<ActionResult> RemoveUserAsync([FromRoute] int? id)
         {
             try
             {

@@ -140,28 +140,13 @@
       "Salary": 66408
     },
     "Id": 1,
-    "FirstName": "Lyla",
+    "FirstName": "00000000000000",
     "LastName": "Humphrey",
     "HairColor": "Black",
     "EyeColor": "Brown",
     "Age": 36,
     "Weight": 64.8,
     "Height": 180,
-    "Sex": "F"
-  },
-  {
-    "JobTitle": {
-      "JobTitle": "frfrfr",
-      "Salary": 1231434343
-    },
-    "Id": 15,
-    "FirstName": "aaabbbb",
-    "LastName": "aabbbb",
-    "HairColor": "qwsqwsw",
-    "EyeColor": "Gray",
-    "Age": 18,
-    "Weight": 45,
-    "Height": 150,
     "Sex": "F"
   }
 ]
