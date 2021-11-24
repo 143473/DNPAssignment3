@@ -9,7 +9,7 @@ namespace WebAPI.Data
         Task<IList<User>> GetUsersAsync();
         Task AddUserAsync(User newUser);
         Task RemoveUserAsync(int? userId);
-        Task<User> UpdateUserAsync(User user);
+        Task UpdateUserAsync(User user);
         Task<User> GetUserAsync(int? id);
         Task<User> ValidateUserAsync(string userName, string password);
 

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FileData;
+using Microsoft.EntityFrameworkCore;
 using WebAPI.Models;
 
 
@@ -9,24 +11,27 @@ namespace WebAPI.Data
 {
     public class UserService : IUserService
     {
-        private static IList<User> users;
+        //private static IList<User> users;
+        private AdultsContext adultsContext;
 
-        public UserService()
+        public UserService(AdultsContext adultsContext)
         {
-            users = new List<User>();
+            this.adultsContext = adultsContext;
+            //users = new List<User>();
             Seed();
         }
 
         public async Task<IList<User>>  GetUsersAsync()
         {
-            return users;
+            //return users;
+            return await adultsContext.Users.ToListAsync();
         }
 
         public async Task AddUserAsync(User newUser)
         {
-            users.Add(new User()
+            adultsContext.Users.Add(new User()
             {
-                Id = users.Max(user => user.Id)+1,
+                Id = adultsContext.Users.Max(user => user.Id)+1,
                 Password = newUser.Password,
                 Role = "user",
                 SecurityLevel = 1,
@@ -36,26 +41,41 @@ namespace WebAPI.Data
 
         public async Task RemoveUserAsync(int? userId)
         {
-            User user = users.First(t => t.Id == userId);
-            users.Remove(user);
+            User toDelete = await adultsContext.Users.FirstOrDefaultAsync(t => t.Id == userId);
+            if (toDelete != null)
+            {
+                adultsContext.Users.Remove(toDelete);
+                await adultsContext.SaveChangesAsync();
+            }
         }
 
-        public async Task<User> UpdateUserAsync(User user)
+        public async Task UpdateUserAsync(User user)
         {
-            User toUpdate = users.First(t => t.Id == user.Id);
-            users.Remove(toUpdate);
-            users.Add(user);
-            return user;
+            try
+            {
+                User toUpdate = await adultsContext.Users.FirstAsync(t => t.Id == user.Id);
+                if (toUpdate != null)
+                {
+                      adultsContext.Users.Update(user);
+                      await adultsContext.SaveChangesAsync();
+                }
+              
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Did not find adult with id {user.Id}");
+            }
+            
         }
 
         public async Task<User> GetUserAsync(int? id)
         {
-            return users.FirstOrDefault(t => t.Id == id);
+            return await adultsContext.Users.FirstOrDefaultAsync(t => t.Id == id);
         }
 
         public async Task<User> ValidateUserAsync(string userName, string password)
         {
-            User user = users.FirstOrDefault(u => u.UserName.Equals(userName) && u.Password.Equals(password));
+            User user = await adultsContext.Users.FirstOrDefaultAsync(u => u.UserName.Equals(userName) && u.Password.Equals(password));
             if (user != null)
             {
                 return user;
@@ -63,17 +83,9 @@ namespace WebAPI.Data
             throw new Exception("User not found");
         }
 
-        private void Seed()
+        private async Task Seed()
         {
-            users.Add(new User
-            {
-                Id = 0,
-                UserName = "admin",
-                Password = "1234",
-                Role = "admin",
-                SecurityLevel = 3
-            });
-            users.Add(new User
+            adultsContext.Users.Add(new User
             {
                 Id = 1,
                 UserName = "claudiu",
@@ -81,7 +93,7 @@ namespace WebAPI.Data
                 Role = "user",
                 SecurityLevel = 1
             });
-            users.Add(new User
+            adultsContext.Users.Add(new User
             {
                 Id = 2,
                 UserName = "emanuel",
@@ -89,6 +101,15 @@ namespace WebAPI.Data
                 Role = "moderator",
                 SecurityLevel = 2
             });
+            adultsContext.Users.Add(new User
+            {
+                Id = 0,
+                UserName = "admin",
+                Password = "1234",
+                Role = "admin",
+                SecurityLevel = 3
+            });
+            await adultsContext.SaveChangesAsync();
         }
     }
 }

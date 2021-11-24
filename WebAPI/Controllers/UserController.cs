@@ -97,8 +97,8 @@ namespace WebAPI.Controllers
         {
             try
             {
-                User updatedUser = await userService.UpdateUserAsync(user);
-                return Ok(updatedUser);
+               await userService.UpdateUserAsync(user);
+                return Ok();
             }
             catch (Exception e)
             {
