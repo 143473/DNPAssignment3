@@ -18,7 +18,7 @@ namespace WebAPI.Data
         {
             this.adultsContext = adultsContext;
             //users = new List<User>();
-            Seed();
+            // Seed();
         }
 
         public async Task<IList<User>>  GetUsersAsync()
@@ -29,14 +29,18 @@ namespace WebAPI.Data
 
         public async Task AddUserAsync(User newUser)
         {
-            adultsContext.Users.Add(new User()
-            {
-                Id = adultsContext.Users.Max(user => user.Id)+1,
-                Password = newUser.Password,
-                Role = "user",
-                SecurityLevel = 1,
-                UserName = newUser.UserName
-            });
+            Console.WriteLine("add here");
+            newUser.Role = "user";
+            newUser.SecurityLevel = 1;
+            await adultsContext.Users.AddAsync(newUser);
+            // {
+            //
+            //     Password = newUser.Password,
+            //     Role = "user",
+            //     SecurityLevel = 1,
+            //     UserName = newUser.UserName
+            // });
+            await adultsContext.SaveChangesAsync();
         }
 
         public async Task RemoveUserAsync(int? userId)
@@ -56,7 +60,8 @@ namespace WebAPI.Data
                 User toUpdate = await adultsContext.Users.FirstAsync(t => t.Id == user.Id);
                 if (toUpdate != null)
                 {
-                      adultsContext.Users.Update(user);
+                      adultsContext.Users.Remove(toUpdate);
+                      await adultsContext.Users.AddAsync(user);
                       await adultsContext.SaveChangesAsync();
                 }
               
@@ -75,6 +80,7 @@ namespace WebAPI.Data
 
         public async Task<User> ValidateUserAsync(string userName, string password)
         {
+            Console.WriteLine("validate here");
             User user = await adultsContext.Users.FirstOrDefaultAsync(u => u.UserName.Equals(userName) && u.Password.Equals(password));
             if (user != null)
             {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using WebAPI.Models;
@@ -17,20 +18,34 @@ namespace WebAPI.Data
 
         public AdultService(AdultsContext adultsContext)
         {
-            FileContext = new FileContext();
-            this.adultsContext = adultsContext;
-            foreach (var adult in FileContext.Adults)
-            {
-                adultsContext.Adults.AddAsync(adult);
-            }
-
-            adultsContext.SaveChangesAsync();
+           
+            this.adultsContext = adultsContext; 
+            //FileContext = new FileContext();
+            // foreach (var adult in FileContext.Adults)
+            // {
+            //     adultsContext.Adults.AddAsync(adult);
+            // }
+            //
+            // adultsContext.SaveChangesAsync();
         }
 
         public async Task<IList<Adult>>  GetAdultsAsync()
         {
             //return FileContext.Adults;
-            return await adultsContext.Adults.ToListAsync();
+           // IList<Adult> adults = await adultsContext.Adults.ToListAsync();
+           // IList<Job> jobs = await adultsContext.Jobs.ToListAsync();
+           // foreach (var adult in adults)
+           // {
+           //     foreach (var job in jobs)
+           //     {
+           //         if (adult.JobTitle.Id == job.Id)
+           //             adult.JobTitle = job;
+           //     }
+           // }
+           
+           
+
+           return await adultsContext.Adults.Include("JobTitle").ToListAsync();
         }
 
         public async Task<Adult> AddAdultAsync(Adult newAdult)
@@ -71,7 +86,10 @@ namespace WebAPI.Data
             try
             {
                 Adult toUpdate = await adultsContext.Adults.FirstAsync(t => t.Id == adult.Id);
-                adultsContext.Update(toUpdate);
+                adultsContext.Adults.Remove(toUpdate);
+                await adultsContext.Adults.AddAsync(adult);
+                // toUpdate = adult;
+         
                 await adultsContext.SaveChangesAsync();
                 return toUpdate;
             }
@@ -84,7 +102,13 @@ namespace WebAPI.Data
         public async Task<Adult> GetAdultAsync(int? id)
         {
            // return FileContext.Adults.FirstOrDefault(t => t.Id == id);
-           return await adultsContext.Adults.FirstOrDefaultAsync(t => t.Id == id);
+           // Adult adult =await adultsContext.Adults.FirstOrDefaultAsync(t => t.Id == id);
+           // Job job = await adultsContext.Jobs.FirstOrDefaultAsync(t => t.Id == adult.JobTitle.Id);
+           // adult.JobTitle = job;
+           // return adult;
+           Adult adult =  adultsContext.Adults.Include("JobTitle").FirstOrDefault(t => t.Id == id);
+           return adult;
+           //adults.FirstOrDefault(t => t.Id == id);
         }
 
         // public async Task<List<Adult>> SearchFilterAsync(string searchByName, string filter, string filter2)
