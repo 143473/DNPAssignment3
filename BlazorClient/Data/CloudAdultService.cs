@@ -4,30 +4,20 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BlazorClient.Models;
+using Microsoft.AspNetCore.Components;
 
 namespace BlazorClient.Data
 {
     public class CloudAdultService : IAdultData
     {
         private string uri = "https://localhost:5002";
-        // private string uri = "http://jsonplaceholder.typicode.com";
         private readonly HttpClient client;
 
         public CloudAdultService() {
         
             client = new HttpClient();
         }
-
-        public async Task<IList<Adult>> GetAdultsAsync() {
-            var stringAsync = client.GetStringAsync(uri + "/adults");
-            var message = await stringAsync;
-            var adults = JsonSerializer.Deserialize<List<Adult>>(message, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
-            return adults;
-        }
-
+        
         public async Task AddAdultAsync(Adult adult) {
             string adultAsJson = JsonSerializer.Serialize(adult);
             HttpContent content = new StringContent(adultAsJson,
@@ -59,9 +49,39 @@ namespace BlazorClient.Data
             return adult;
         }
 
-       /* public Task<List<Adult>> SearchFilterAsync(string searchByName, string filter, string filter2)
-        {
-            throw new System.NotImplementedException();
-        }*/
+       public async Task<IList<Adult>> SearchFilterAsync(string searchByName, string filter, string filter2)
+       {
+           var filters =
+               $"?searchByName={searchByName}&filter={filter}&filter2={filter2}";
+            var stringAsync = client.GetStringAsync(uri + $"/FilteredAdults"+filters);
+            var adultList = await stringAsync;
+            var adults = JsonSerializer.Deserialize<IList<Adult>>(adultList, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+            return adults;
+        }
+
+       public async Task<List<string>> GetFilterCategories()
+       {
+           var stringAsync = client.GetStringAsync(uri + $"/categories");
+           var categories1 = await stringAsync;
+           var categories = JsonSerializer.Deserialize<List<string>>(categories1, new JsonSerializerOptions
+           {
+               PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+           });
+           return categories;
+       }
+       
+       public async Task<List<string>> GetFilterList(string category)
+       {
+           var stringAsync = client.GetStringAsync(uri + $"/filterList?category={category}");
+           var filters = await stringAsync;
+           var filters1 = JsonSerializer.Deserialize<List<string>>(filters, new JsonSerializerOptions
+           {
+               PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+           });
+           return filters1;
+       }
     }
 }

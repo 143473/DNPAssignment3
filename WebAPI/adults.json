@@ -1,6 +1,51 @@
 [
   {
     "JobTitle": {
+      "JobTitle": "Mascot",
+      "Salary": 99821
+    },
+    "Id": 0,
+    "FirstName": "Yasmine",
+    "LastName": "Baxter",
+    "HairColor": "Black",
+    "EyeColor": "Brown",
+    "Age": 58,
+    "Weight": 39.8,
+    "Height": 174,
+    "Sex": "F"
+  },
+  {
+    "JobTitle": {
+      "JobTitle": "Front End Web Developer",
+      "Salary": 66408
+    },
+    "Id": 1,
+    "FirstName": "Lyla",
+    "LastName": "Humphrey",
+    "HairColor": "Black",
+    "EyeColor": "Brown",
+    "Age": 36,
+    "Weight": 64.8,
+    "Height": 147,
+    "Sex": "F"
+  },
+  {
+    "JobTitle": {
+      "JobTitle": "Business Development Manager",
+      "Salary": 71456
+    },
+    "Id": 2,
+    "FirstName": "Samara",
+    "LastName": "Humphrey",
+    "HairColor": "Black",
+    "EyeColor": "Brown",
+    "Age": 34,
+    "Weight": 37,
+    "Height": 145,
+    "Sex": "F"
+  },
+  {
+    "JobTitle": {
       "JobTitle": "Teacher",
       "Salary": 91588
     },
@@ -133,20 +178,5 @@
     "Weight": 81.8,
     "Height": 172,
     "Sex": "M"
-  },
-  {
-    "JobTitle": {
-      "JobTitle": "sdeefe",
-      "Salary": 123321212
-    },
-    "Id": 15,
-    "FirstName": "1111111111111",
-    "LastName": "qweq",
-    "HairColor": "qweq",
-    "EyeColor": "qweq",
-    "Age": 18,
-    "Weight": 50,
-    "Height": 150,
-    "Sex": "F"
   }
 ]

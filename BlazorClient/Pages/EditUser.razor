@@ -41,7 +41,7 @@ else
             <tr>
                 <td>Security Level</td>
                 <td>
-                    <InputSelect @bind-Value="userToEdit.SecurityLevel">
+                    <InputSelect @bind-Value="userToEdit.SecurityLevel" disabled>
                         <option value="1">Level 1</option>
                         <option value="2">Level 2</option>
                     </InputSelect>
@@ -62,6 +62,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         userToEdit = await UserService.GetUserAsync(Id);
+        if (userToEdit.Role.Equals("user"))
+        {
+            userToEdit.SecurityLevel = 1;
+        }
+        else
+        {
+            userToEdit.SecurityLevel = 2;
+        }
     }
 
     private async Task Save()

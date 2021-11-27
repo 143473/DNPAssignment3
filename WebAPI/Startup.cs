@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using WebAPI.Data;
+using WebAPI.MiddlePoint;
 
 namespace WebAPI
 {
@@ -32,6 +33,7 @@ namespace WebAPI
             services.AddDbContext<AdultsContext>();
             services.AddScoped<IAdultService, AdultService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAdultMiddlePoint, AdultMiddlePoint>();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "WebAPI", Version = "v1"}); });
         }
 

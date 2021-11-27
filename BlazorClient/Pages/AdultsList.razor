@@ -14,18 +14,18 @@
     Search Adult by name: <input type="text" @oninput="@(arg => SearchByName(arg))" style="width: 250px"/>
 </p>
 
-<EditForm Model="filter">
+<EditForm Model="categories">
 
     <div >
         Filter by:
         <InputSelect @oninput="@(arg => Filter(arg))" @bind-Value="filter">
             <option value="">Choose Category</option>
-            @foreach (var item in filterList)
+            @foreach (var item in categories)
             {
                 <option value=@item>@item</option>
             }
         </InputSelect>
-        @if (filterList.Exists(t => filter.Equals(t)))
+        @if (categories.Exists(t => filter.Equals(t)))
         {
             <InputSelect @oninput="@(arg => Filter2(arg))" @bind-Value="filter2">
 
@@ -118,33 +118,31 @@ else
 
 @code {
     private IList<Adult> adultsToShow;
-    private IList<Adult> allAdults;
 
     private string searchByName = "";
     private string filter = "";
     private string filter2 = "";
-    private string orderBy = "";
 
-    private List<string> filterList = new() {"HairColor", "EyeColor", "Sex", "JobTitle"};
+
+    private List<string> categories = new ();
     private List<string> filterList2;
 
     protected override async Task OnInitializedAsync()
     {
-        allAdults = await AdultData.GetAdultsAsync();
-        await ExecuteFilter();
+        categories = await AdultData.GetFilterCategories();
+        adultsToShow = await AdultData.SearchFilterAsync(null, null, null);
     }
 
     private async Task RemoveAdult(int adultId)
     {
-        Adult adultToRemove = allAdults.First(t => t.Id == adultId);
+
         await AdultData.RemoveAdultAsync(adultId);
-        allAdults.Remove(adultToRemove);
-        adultsToShow.Remove(adultToRemove);
+        await ExecuteFilter2();
     }
 
     private async Task SearchByName(ChangeEventArgs changeEventArgs)
     {
-        searchByName = null;
+        searchByName = "";
         try
         {
             searchByName = changeEventArgs.Value.ToString();
@@ -152,42 +150,28 @@ else
         catch (Exception)
         {
         }
-        await ExecuteFilter();
+        await ExecuteFilter2();
     }
 
     private async Task Filter(ChangeEventArgs changeEventArgs)
     {
-        filter = null;
-        filterList2 = null;
-        try
+        var category = changeEventArgs.Value.ToString();
+        if (category.Equals(""))
         {
-            filter = changeEventArgs.Value.ToString();
-            switch (filter)
-            {
-                case "HairColor":
-                    filterList2 = allAdults.Select(x => x.HairColor).Distinct().ToList();
-                    break;
-                case "EyeColor":
-                    filterList2 = allAdults.Select(x => x.EyeColor).Distinct().ToList();
-                    break;
-                case "Sex":
-                    filterList2 = allAdults.Select(x => x.Sex).Distinct().ToList();
-                    break;
-                case "JobTitle":
-                    filterList2 = allAdults.Select(x => x.JobTitle.JobTitle).Distinct().ToList();
-                    break;
-            }
+            filter = "";
+            filter2 = "";
         }
-        catch (Exception)
+        else
         {
+            filter2 = "";
+            filterList2 = await AdultData.GetFilterList(category);
         }
-        filter2 = "";
-        await ExecuteFilter();
+        await ExecuteFilter2();
     }
 
     private async Task Filter2(ChangeEventArgs changeEventArgs)
     {
-        filter2 = null;
+        filter2 = "";
         try
         {
             filter2 = changeEventArgs.Value.ToString();
@@ -195,76 +179,13 @@ else
         catch (Exception)
         {
         }
-        await ExecuteFilter();
+        await ExecuteFilter2();
     }
-
-    private async Task ExecuteFilter()
+    
+    private async Task ExecuteFilter2()
     {
-        adultsToShow = allAdults.Where(t =>
-            (!searchByName.Equals("") && (t.FirstName.Contains(searchByName, StringComparison.OrdinalIgnoreCase) ||
-                                          t.LastName.Contains(searchByName, StringComparison.OrdinalIgnoreCase)) ||
-             searchByName.Equals("")) &&
-            (!filter2.Equals("") &&
-             (t.Sex.Equals(filter2) || (t.EyeColor.Equals(filter2) && filter.Equals("EyeColor")) ||
-              (t.HairColor.Equals(filter2) && filter.Equals("HairColor")) || t.JobTitle.JobTitle.Equals(filter2)) ||
-             filter2.Equals("")
-                )
-            ).ToList();
+        adultsToShow = await AdultData.SearchFilterAsync(searchByName, filter, filter2);
     }
-
-    /*private void OrderBy()
-    {
-        switch (orderBy)
-        {
-            case "Id": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.Id).ToList();
-                break;
-            case "FirstName": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.FirstName).ToList();
-                break;
-            case "LastName": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.LastName).ToList();
-                break;
-            case "HairColor": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.HairColor).ToList();
-                break;
-            case "EyeColor": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.EyeColor).ToList();
-                break;
-            case "Height": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.Height).ToList();
-                break;
-            case "Age": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.Age).ToList();
-                break;
-            case "Weight": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.Weight).ToList();
-                break;
-            case "Sex": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.Sex).ToList();
-                break;
-            case "JobTitle": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.JobTitle.JobTitle).ToList();
-                break;
-            case "Salary": 
-                ExecuteFilter();
-                adultsToShow.OrderBy(t => t.JobTitle.Salary).ToList();
-                break;
-
-        }
-
-        
-    }*/
 
     private void Edit(int id)
     {

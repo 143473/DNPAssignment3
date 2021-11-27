@@ -3,25 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FileData;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Data;
+using WebAPI.MiddlePoint;
 using WebAPI.Models;
 
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Microsoft.AspNetCore.Mvc.Route("[controller]")]
     public class AdultController : ControllerBase
     {
         private readonly IAdultService adultService;
+        private IAdultMiddlePoint adultMiddlePoint;
 
-        public AdultController(IAdultService adultService)
+        public AdultController(IAdultService adultService, IAdultMiddlePoint adultMiddlePoint)
         {
             this.adultService = adultService;
+            this.adultMiddlePoint = adultMiddlePoint;
         }
         
         [HttpGet]
-        [Route("/adults")]
+        [Microsoft.AspNetCore.Mvc.Route("/adults")]
         public async Task<ActionResult<IList<Adult>>>
             GetAdultsAsync()
         {
@@ -38,7 +42,7 @@ namespace WebAPI.Controllers
         }
         
         [HttpGet]
-        [Route("{id:int}")]
+        [Microsoft.AspNetCore.Mvc.Route("{id:int}")]
         public async Task<ActionResult<Adult>> GetAdultAsync([FromRoute] int? id)
         {
             try
@@ -54,7 +58,7 @@ namespace WebAPI.Controllers
         }
         
         [HttpDelete]
-        [Route("{id:int}")]
+        [Microsoft.AspNetCore.Mvc.Route("{id:int}")]
         public async Task<ActionResult> RemoveAdultAsync([FromRoute] int id)
         {
             try
@@ -90,7 +94,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPatch]
-        [Route("{id:int}")]
+        [Microsoft.AspNetCore.Mvc.Route("{id:int}")]
         public async Task<ActionResult<Adult>> UpdateAdultAsync([FromBody] Adult adult)
         {
             try
@@ -105,22 +109,53 @@ namespace WebAPI.Controllers
             }
         }
         
-        /*[HttpGet]
-        [Route("/filter")]
-        public List<Adult> SearchFilter(string searchByName, string filter, string filter2)
+        [HttpGet]
+        [Microsoft.AspNetCore.Mvc.Route("/FilteredAdults")]
+        public async Task<ActionResult<IList<Adult>>> SearchFilter([FromQuery]string searchByName, string filter, string filter2)
         {
-            var adultsToShow = FileContext.Adults.Where(t =>
-                (!searchByName.Equals("") && (t.FirstName.Contains(searchByName, StringComparison.OrdinalIgnoreCase) ||
-                                              t.LastName.Contains(searchByName, StringComparison.OrdinalIgnoreCase)) ||
-                 searchByName.Equals("")) &&
-                (!filter2.Equals("") &&
-                 (t.Sex.Equals(filter2) || (t.EyeColor.Equals(filter2) && filter.Equals("EyeColor")) ||
-                  (t.HairColor.Equals(filter2) && filter.Equals("HairColor")) || t.JobTitle.JobTitle.Equals(filter2)) ||
-                 filter2.Equals("")
-                )
-            ).ToList();
-            var ordered = adultsToShow.OrderBy(t => t.Id).ToList();
-            return ordered;
-        }*/
+            try
+            {
+                IList<Adult> adults = await adultMiddlePoint.SearchFilterAsync(searchByName, filter, filter2);
+                return Ok(adults);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(500, e.Message);
+            }
+        }
+        
+        [HttpGet]
+        [Microsoft.AspNetCore.Mvc.Route("/categories")]
+        public async Task<ActionResult<IList<string>>>
+            GetCategoriesAsync()
+        {
+            try
+            {
+                IList<string> categories = await adultMiddlePoint.GetFilterCategories();
+                return Ok(categories);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(500, e.Message);
+            }
+        }
+        [HttpGet]
+        [Microsoft.AspNetCore.Mvc.Route("/filterList")]
+        public async Task<ActionResult<IList<string>>>
+            GetFilterListAsync([FromQuery]string category)
+        {
+            try
+            {
+                IList<string> filterList = await adultMiddlePoint.GetFilterList(category);
+                return Ok(filterList);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return StatusCode(500, e.Message);
+            }
+        }
     }
 }

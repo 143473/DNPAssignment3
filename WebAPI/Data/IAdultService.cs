@@ -11,6 +11,5 @@ namespace WebAPI.Data
         Task RemoveAdultAsync(int adultId);
         Task<Adult> UpdateAdultAsync(Adult adult);
         Task<Adult> GetAdultAsync(int? id);
-        //Task<List<Adult>> SearchFilterAsync(string searchByName, string filter, string filter2);
     }
 }

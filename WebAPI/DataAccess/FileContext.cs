@@ -14,7 +14,7 @@ namespace FileData
         public IList<User> Users { get; private set; }
 
         private readonly string usersFile = "users.json";
-        private readonly string familiesFile = "families.json";
+        //private readonly string familiesFile = "families.json";
         private readonly string adultsFile = "adults.json";
 
         public FileContext()

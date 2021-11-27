@@ -11,35 +11,25 @@ namespace WebAPI.Data
 {
     public class UserService : IUserService
     {
-        //private static IList<User> users;
         private AdultsContext adultsContext;
 
         public UserService(AdultsContext adultsContext)
         {
             this.adultsContext = adultsContext;
-            //users = new List<User>();
-            // Seed();
         }
 
         public async Task<IList<User>>  GetUsersAsync()
         {
-            //return users;
             return await adultsContext.Users.ToListAsync();
         }
 
         public async Task AddUserAsync(User newUser)
         {
-            Console.WriteLine("add here");
+
             newUser.Role = "user";
             newUser.SecurityLevel = 1;
+            
             await adultsContext.Users.AddAsync(newUser);
-            // {
-            //
-            //     Password = newUser.Password,
-            //     Role = "user",
-            //     SecurityLevel = 1,
-            //     UserName = newUser.UserName
-            // });
             await adultsContext.SaveChangesAsync();
         }
 
@@ -60,11 +50,14 @@ namespace WebAPI.Data
                 User toUpdate = await adultsContext.Users.FirstAsync(t => t.Id == user.Id);
                 if (toUpdate != null)
                 {
-                      adultsContext.Users.Remove(toUpdate);
-                      await adultsContext.Users.AddAsync(user);
-                      await adultsContext.SaveChangesAsync();
+                    toUpdate.UserName = user.UserName;
+                    toUpdate.Password = user.Password;
+                    toUpdate.Role = user.Role;
+                    toUpdate.SecurityLevel = user.SecurityLevel;
+                     
+                    adultsContext.Users.Update(user);
+                    await adultsContext.SaveChangesAsync();
                 }
-              
             }
             catch (Exception e)
             {
@@ -87,35 +80,6 @@ namespace WebAPI.Data
                 return user;
             } 
             throw new Exception("User not found");
-        }
-
-        private async Task Seed()
-        {
-            adultsContext.Users.Add(new User
-            {
-                Id = 1,
-                UserName = "claudiu",
-                Password = "1234",
-                Role = "user",
-                SecurityLevel = 1
-            });
-            adultsContext.Users.Add(new User
-            {
-                Id = 2,
-                UserName = "emanuel",
-                Password = "1234",
-                Role = "moderator",
-                SecurityLevel = 2
-            });
-            adultsContext.Users.Add(new User
-            {
-                Id = 0,
-                UserName = "admin",
-                Password = "1234",
-                Role = "admin",
-                SecurityLevel = 3
-            });
-            await adultsContext.SaveChangesAsync();
         }
     }
 }
