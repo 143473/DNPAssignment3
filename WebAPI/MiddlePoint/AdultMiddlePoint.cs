@@ -24,26 +24,14 @@ namespace WebAPI.MiddlePoint
         }
         public async Task<List<Adult>> SearchFilterAsync(string searchByName, string filter, string filter2)
         {
-            if (searchByName == null)
-            {
-                searchByName = "";
-            }
-            if (filter == null)
-            {
-                filter = "";
-            }
-            if (filter2 == null)
-            {
-                filter2 = "";
-            }
             var adultsToShow = adults.Where(t =>
-                (!searchByName.Equals("") && (t.FirstName.Contains(searchByName, StringComparison.OrdinalIgnoreCase) ||
+                (searchByName != null && (t.FirstName.Contains(searchByName, StringComparison.OrdinalIgnoreCase) ||
                                               t.LastName.Contains(searchByName, StringComparison.OrdinalIgnoreCase)) ||
-                 searchByName.Equals("")) &&
-                (!filter2.Equals("") &&
+                 searchByName == null) &&
+                (filter2!= null &&
                  (t.Sex.Equals(filter2) || (t.EyeColor.Equals(filter2) && filter.Equals("EyeColor")) ||
                   (t.HairColor.Equals(filter2) && filter.Equals("HairColor")) || t.JobTitle.JobTitle.Equals(filter2)) ||
-                 filter2.Equals("")
+                 filter2==null
                 )
             ).ToList();
             var ordered = adultsToShow.OrderBy(t => t.Id).ToList();
@@ -57,12 +45,10 @@ namespace WebAPI.MiddlePoint
         
         public async Task<IList<string>> GetFilterList(string category)
         {
-            var filter = "";
             filterList2 = null;
             try
             {
-                filter = category;
-                switch (filter)
+                switch (category)
                 {
                     case "HairColor":
                         filterList2 = adults.Select(x => x.HairColor).Distinct().ToList();

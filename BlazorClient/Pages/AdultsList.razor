@@ -130,7 +130,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         categories = await AdultData.GetFilterCategories();
-        adultsToShow = await AdultData.SearchFilterAsync(null, null, null);
+        await ExecuteFilter2();
     }
 
     private async Task RemoveAdult(int adultId)
