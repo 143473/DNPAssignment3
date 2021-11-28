@@ -47,17 +47,14 @@ namespace WebAPI.Data
         {
             try
             {
-                User toUpdate = await adultsContext.Users.FirstAsync(t => t.Id == user.Id);
-                if (toUpdate != null)
-                {
-                    toUpdate.UserName = user.UserName;
-                    toUpdate.Password = user.Password;
-                    toUpdate.Role = user.Role;
-                    toUpdate.SecurityLevel = user.SecurityLevel;
-                     
-                    adultsContext.Users.Update(user);
-                    await adultsContext.SaveChangesAsync();
-                }
+                User toUpdate = await adultsContext.Users.FirstOrDefaultAsync(t => t.Id == user.Id);
+                toUpdate.UserName = user.UserName;
+                toUpdate.Password = user.Password;
+                toUpdate.Role = user.Role;
+                toUpdate.SecurityLevel = user.SecurityLevel;
+                
+                adultsContext.Users.Update(toUpdate);
+                await adultsContext.SaveChangesAsync();
             }
             catch (Exception e)
             {

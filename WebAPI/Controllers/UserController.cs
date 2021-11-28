@@ -21,8 +21,6 @@ namespace WebAPI.Controllers
         [HttpGet]
         [Route("/users")]
         public async Task<ActionResult<IList<User>>> GetUsersAsync()
-            // [FromQuery] int? id, [FromQuery] string userName, [FromQuery] string password,
-            // [FromQuery] string role, [FromQuery] int? securityLevel
         {
             try
             {
@@ -39,7 +37,7 @@ namespace WebAPI.Controllers
         
         [HttpGet]
         [Route("{id:int}")]
-        public async Task<ActionResult<User>> GetUserAsync([FromRoute] int? id)
+        public async Task<ActionResult<User>> GetUserAsync([FromRoute] int id)
         {
             try
             {
@@ -79,9 +77,7 @@ namespace WebAPI.Controllers
             try
             {
                 await userService.AddUserAsync(user);
-               // User added = await userService.AddUserAsync(user);
-               // return Created($"/User/{user.UserName}", added);
-               return StatusCode(200);
+                return StatusCode(200);
 
             }
             catch (Exception e)
@@ -98,7 +94,7 @@ namespace WebAPI.Controllers
             try
             {
                await userService.UpdateUserAsync(user);
-                return Ok();
+               return Ok();
             }
             catch (Exception e)
             {
