@@ -73,7 +73,6 @@ namespace WebAPI.Data
 
         public async Task<User> ValidateUserAsync(string userName, string password)
         {
-            Console.WriteLine("validate here");
             User user = await adultsContext.Users.FirstOrDefaultAsync(u => u.UserName.Equals(userName) && u.Password.Equals(password));
             if (user != null)
             {
