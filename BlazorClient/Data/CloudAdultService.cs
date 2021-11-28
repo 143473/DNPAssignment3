@@ -64,7 +64,7 @@ namespace BlazorClient.Data
 
        public async Task<List<string>> GetFilterCategories()
        {
-           var stringAsync = client.GetStringAsync(uri + $"/categories");
+           var stringAsync = client.GetStringAsync(uri + $"/Adult/categories");
            var categories1 = await stringAsync;
            var categories = JsonSerializer.Deserialize<List<string>>(categories1, new JsonSerializerOptions
            {
@@ -75,7 +75,7 @@ namespace BlazorClient.Data
        
        public async Task<List<string>> GetFilterList(string category)
        {
-           var stringAsync = client.GetStringAsync(uri + $"/filterList?category={category}");
+           var stringAsync = client.GetStringAsync(uri + $"/Adult/filterList?category={category}");
            var filters = await stringAsync;
            var filters1 = JsonSerializer.Deserialize<List<string>>(filters, new JsonSerializerOptions
            {

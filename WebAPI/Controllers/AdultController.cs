@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FileData;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Data;
 using WebAPI.MiddlePoint;
@@ -12,7 +11,7 @@ using WebAPI.Models;
 namespace WebAPI.Controllers
 {
     [ApiController]
-    [Microsoft.AspNetCore.Mvc.Route("[controller]")]
+    [Route("[controller]")]
     public class AdultController : ControllerBase
     {
         private readonly IAdultService adultService;
@@ -25,7 +24,7 @@ namespace WebAPI.Controllers
         }
         
         [HttpGet]
-        [Microsoft.AspNetCore.Mvc.Route("/adults")]
+        [Route("/adults")]
         public async Task<ActionResult<IList<Adult>>>
             GetAdultsAsync()
         {
@@ -42,7 +41,7 @@ namespace WebAPI.Controllers
         }
         
         [HttpGet]
-        [Microsoft.AspNetCore.Mvc.Route("{id:int}")]
+        [Route("{id:int}")]
         public async Task<ActionResult<Adult>> GetAdultAsync([FromRoute] int? id)
         {
             try
@@ -58,7 +57,7 @@ namespace WebAPI.Controllers
         }
         
         [HttpDelete]
-        [Microsoft.AspNetCore.Mvc.Route("{id:int}")]
+        [Route("{id:int}")]
         public async Task<ActionResult> RemoveAdultAsync([FromRoute] int id)
         {
             try
@@ -94,7 +93,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpPatch]
-        [Microsoft.AspNetCore.Mvc.Route("{id:int}")]
+        [Route("{id:int}")]
         public async Task<ActionResult<Adult>> UpdateAdultAsync([FromBody] Adult adult)
         {
             try
@@ -110,7 +109,7 @@ namespace WebAPI.Controllers
         }
         
         [HttpGet]
-        [Microsoft.AspNetCore.Mvc.Route("/FilteredAdults")]
+        [Route("/FilteredAdults")]
         public async Task<ActionResult<IList<Adult>>> SearchFilter([FromQuery]string searchByName, string filter, string filter2)
         {
             try
@@ -126,7 +125,7 @@ namespace WebAPI.Controllers
         }
         
         [HttpGet]
-        [Microsoft.AspNetCore.Mvc.Route("/categories")]
+        [Route("categories")]
         public async Task<ActionResult<IList<string>>>
             GetCategoriesAsync()
         {
@@ -142,7 +141,7 @@ namespace WebAPI.Controllers
             }
         }
         [HttpGet]
-        [Microsoft.AspNetCore.Mvc.Route("/filterList")]
+        [Route("filterList")]
         public async Task<ActionResult<IList<string>>>
             GetFilterListAsync([FromQuery]string category)
         {
